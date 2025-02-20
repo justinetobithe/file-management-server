@@ -3,6 +3,7 @@
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\DesignationController;
 use App\Http\Controllers\FolderController;
 use App\Http\Controllers\MeController;
 use App\Http\Controllers\UserController;
@@ -60,5 +61,15 @@ Route::middleware('auth:sanctum', 'throttle:60,1')->group(function () {
         Route::post('/', [FolderController::class, 'store']);
         Route::get('/{folder}', [FolderController::class, 'show']);
         Route::delete('/{folder}', [FolderController::class, 'destroy']);
+
+        Route::get('/{id}/download', [FolderController::class, 'downloadZip']);
+    });
+
+    Route::get('/designations', [DesignationController::class, 'index']);
+    Route::prefix('/designation')->group(function () {
+        Route::put('/{id}', [DesignationController::class, 'update']);
+        Route::post('/', [DesignationController::class, 'store']);
+        Route::get('/{designation}', [DesignationController::class, 'show']);
+        Route::delete('/{designation}', [DesignationController::class, 'destroy']);
     });
 });

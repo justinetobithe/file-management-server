@@ -14,6 +14,7 @@ return [
         'status_updated' => 'Status updated successfully!',
         'attendance_record_created' => 'Attendance record successfully created. Time In set to now.',
         'time_out_updated' => 'Time Out updated successfully.',
+        'zip_created' => 'ZIP file created successfully!',  
     ],
     'invalid' => [
         'credentials' => 'Invalid Credentials!',

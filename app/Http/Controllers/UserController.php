@@ -86,13 +86,19 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        if ($request->has('password')) {
-            $request->merge(['password' => Hash::make($request->password)]);
-        } else {
-            $request->offsetUnset('password');
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = md5(uniqid() . now()) . '.' . $image->getClientOriginalExtension();
+            $image->storeAs('public/image', $imageName);
+
+            $user->image = $imageName;
         }
 
-        $user->update($request->all());
+        if ($request->has('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->fill($request->except(['image', 'password']))->save();
 
         return response()->json([
             'status' => 'success',

@@ -9,6 +9,7 @@ use App\Services\FileUploadService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Spatie\Activitylog\Models\Activity;
+use ZipArchive;
 
 class FolderController extends Controller
 {
@@ -32,13 +33,38 @@ class FolderController extends Controller
 
         if ($filter) {
             $query->where(function ($q) use ($filter) {
-                $q->where('name', 'like', "%{$filter}%");
+                $q->where('folder_name', 'like', "%{$filter}%")
+                    ->orWhere('local_path', 'like', "%{$filter}%")
+                    ->orWhereDate('created_at', $filter)
+                    ->orWhereHas('departments', function ($q) use ($filter) {
+                        $q->where('name', 'like', "%{$filter}%");
+                    })
+                    ->orWhereHas('subfolders', function ($q) use ($filter) {
+                        $q->where('folder_name', 'like', "%{$filter}%");
+                    });
             });
         }
 
-        if (in_array($sortColumn, ['folder_name', 'local_path', 'start_date', 'end_date'])) {
-            $query->orderBy($sortColumn, $sortDesc);
+        if ($sortColumn && $sortDesc) {
+            $sortableFields = ['date_upload', 'folder_name', 'sub_folders', 'local_path'];
+
+            if (in_array($sortColumn, $sortableFields)) {
+                $sortOrder = in_array($sortDesc, ['asc', 'desc']) ? $sortDesc : 'asc';
+
+                if ($sortColumn === 'date_upload') {
+                    $query->orderByRaw("DATE(created_at) $sortOrder");
+                } elseif ($sortColumn === 'folder_name') {
+                    $query->orderByRaw("folder_name $sortOrder");
+                } elseif ($sortColumn === 'sub_folders') {
+                    $query->with(['subfolders' => function ($q) use ($sortOrder) {
+                        $q->orderBy('folder_name', $sortOrder);
+                    }])->orderBy('folder_name', $sortOrder);
+                } elseif ($sortColumn === 'local_path') {
+                    $query->orderBy('local_path', $sortOrder);
+                }
+            }
         }
+
 
         if ($pageSize) {
             $folders = $query->paginate($pageSize);
@@ -153,5 +179,62 @@ class FolderController extends Controller
             'message' => __('messages.success.deleted'),
             'data' => $folder,
         ]);
+    }
+
+    public function downloadZip($id)
+    {
+        $folder = Folder::with(['fileUploads', 'subfolders.fileUploads'])->findOrFail($id);
+        $zipFileName = $folder->folder_name . '.zip';
+        $tempDir = storage_path('app/public/temp');
+
+        if (!file_exists($tempDir)) {
+            mkdir($tempDir, 0777, true);
+        }
+
+        $zipPath = $tempDir . '/' . $zipFileName;
+        $zip = new ZipArchive;
+
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+            foreach ($folder->fileUploads as $file) {
+                $filePath = storage_path('app/public/uploads/' . basename($file->path));
+                if (file_exists($filePath)) {
+                    $zip->addFile($filePath, basename($filePath));
+                }
+            }
+
+            $this->addSubfoldersToZip($folder, $zip, $folder->folder_name);
+            $zip->close();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => __('messages.success.zip_created'),
+                'data' => asset('storage/temp/' . $zipFileName),
+            ]);
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'Failed to create ZIP file.'], 500);
+        }
+
+        return response()->download($zipPath)->deleteFileAfterSend(true);
+    }
+
+    private function addSubfoldersToZip($folder, $zip, $zipPath)
+    {
+        foreach ($folder->subfolders as $subfolder) {
+            $subfolderPath = $zipPath . '/' . $subfolder->folder_name;
+
+            $zip->addEmptyDir($subfolderPath);
+
+            foreach ($subfolder->fileUploads as $file) {
+                $filePath = storage_path('app/public/uploads/' . basename($file->path));
+                if (file_exists($filePath)) {
+                    $zip->addFile($filePath, $subfolderPath . '/' . basename($filePath));
+                }
+            }
+
+            // Recursively add subfolders
+            if ($subfolder->subfolders->isNotEmpty()) {
+                $this->addSubfoldersToZip($subfolder, $zip, $subfolderPath);
+            }
+        }
     }
 }
