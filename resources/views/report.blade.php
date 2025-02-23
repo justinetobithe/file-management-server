@@ -67,6 +67,13 @@
             color: #333;
         }
 
+        td {
+            word-wrap: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+
         .signature-section {
             display: flex;
             justify-content: space-between;
@@ -84,6 +91,32 @@
 
         .bold {
             font-weight: bold;
+        }
+
+        .subfolder-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .subfolder-item {
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid #ccc;
+            padding: 5px;
+            min-width: 120px;
+            align-items: center;
+        }
+
+        .subfolder-name {
+            flex: 1;
+        }
+
+        .subfolder-size {
+            text-align: right;
+            min-width: 80px;
         }
     </style>
 </head>
@@ -103,7 +136,7 @@
                 <p><strong>Page No.:</strong> Page 1 of 1</p>
                 <p><strong>Form No.:</strong> RMD - 409</p>
                 <p><strong>Revision No.:</strong> 2</p>
-                <p><strong>Effectivity:</strong> Jan. 30, 2024</p>
+                <p><strong>Effectivity:</strong> {{ \Carbon\Carbon::parse($reportData['effectiveDate'])->format('M. d, Y') }}</p>
             </div>
         </div>
 
@@ -113,58 +146,70 @@
                     <th>Department</th>
                     <th>Folder Name (Main)</th>
                     <th>Folder Name (Sub)</th>
-                    <th>Folder Size</th>
+                    <th>Size</th>
                     <th>Folder Location</th>
                     <th>Coverage Period</th>
                 </tr>
             </thead>
             <tbody>
+                @foreach($reportData['folders'] as $folder)
                 <tr>
-                    <td rowspan="6">Logistics Management Section</td>
-                    <td rowspan="6">LMS_BACKUP_01102025 (36.1 MB)</td>
-                    <td>ACCOMPLISHMENT REPORT DECEMBER 2024</td>
-                    <td>1.29 MB</td>
-                    <td rowspan="6">D:\OneDrive\OneDrive - pagcor.ph\RECORDS DIGITIZATION FOLDER</td>
-                    <td rowspan="6">DECEMBER 1–31, 2024</td>
+                    <td>
+                        @foreach($folder['departments'] as $department)
+                        {{ $department['name'] }}@if(!$loop->last), @endif
+                        @endforeach
+                    </td>
+
+                    <td>{{ $folder['folder_name'] }}</td>
+
+                    <td>
+                        <ul class="subfolder-list">
+                            @foreach($folder['subfolders'] as $subfolder)
+                            <li class="subfolder-item">
+                                <div class="subfolder-name">
+                                    {{ $subfolder['folder_name'] }}
+                                </div>
+                            </li>
+                            @endforeach
+                        </ul>
+                    </td>
+                    <td>
+                        <ul class="subfolder-list">
+                            @foreach($folder['subfolders'] as $subfolder)
+                            <li class="subfolder-item">
+                                <div class="subfolder-name">
+                                    {{ $subfolder['total_size'] }}
+                                </div>
+                            </li>
+                            @endforeach
+                        </ul>
+                    </td>
+
+                    <td>{{ $folder['local_path'] }}</td>
+
+                    <td>
+                        {{ \Carbon\Carbon::parse($folder['start_date'])->format('M. d, Y') }} –
+                        {{ \Carbon\Carbon::parse($folder['end_date'])->format('M. d, Y') }}
+                    </td>
                 </tr>
-                <tr>
-                    <td>DIS & IAR DECEMBER 2024</td>
-                    <td>13.2 MB</td>
-                </tr>
-                <tr>
-                    <td>EOM RSM DECEMBER 2024</td>
-                    <td>923 KB</td>
-                </tr>
-                <tr>
-                    <td>FAMS DECEMBER 2024</td>
-                    <td>6.27 MB</td>
-                </tr>
-                <tr>
-                    <td>REQUISITION AND ISSUE SLIP DECEMBER 2024</td>
-                    <td>2.56 MB</td>
-                </tr>
-                <tr>
-                    <td>RV TRANSACTIONS DECEMBER 2024</td>
-                    <td>12.3 MB</td>
-                </tr>
+                @endforeach
             </tbody>
         </table>
 
         <div class="signature-section">
             <div class="signature-box">
                 <p class="bold">Prepared By:</p>
-                <p>LEXTER R. ODUCAYEN</p>
-                <p>STOCKMAN I</p>
+                <p>{{ $reportData['user']['first_name'] }} {{ $reportData['user']['last_name'] }}</p>
+                <p>{{ $reportData['user']['designation']['designation'] ?? '' }}</p>
                 <p>Date: _______________</p>
             </div>
             <div class="signature-box">
                 <p class="bold">Checked By:</p>
-                <p>KATHYREEN C. GONZALES</p>
-                <p>LMO II</p>
+                <p>{{ $reportData['checkedBy']['first_name'] }} {{ $reportData['checkedBy']['last_name'] }}</p>
+                <p>{{ $reportData['checkedBy']['designation']['designation'] ?? '' }}</p>
                 <p>Date: _______________</p>
             </div>
         </div>
-
     </div>
 
 </body>

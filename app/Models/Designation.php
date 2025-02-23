@@ -2,14 +2,18 @@
 
 namespace App\Models;
 
+use App\Traits\ActivityLoggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Designation extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes, ActivityLoggable;
 
-    protected $guareded = ['id'];
+    protected $guarded = ['id'];
+
+    protected $appends = ['activity_log'];
 
     public function designation()
     {

@@ -63,6 +63,7 @@ Route::middleware('auth:sanctum', 'throttle:60,1')->group(function () {
         Route::delete('/{folder}', [FolderController::class, 'destroy']);
 
         Route::get('/{id}/download', [FolderController::class, 'downloadZip']);
+        Route::post('/generate-report', [FolderController::class, 'generateReport']);
     });
 
     Route::get('/designations', [DesignationController::class, 'index']);

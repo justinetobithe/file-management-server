@@ -10,6 +10,7 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Spatie\Activitylog\Models\Activity;
 use ZipArchive;
+use PDF;
 
 class FolderController extends Controller
 {
@@ -236,5 +237,28 @@ class FolderController extends Controller
                 $this->addSubfoldersToZip($subfolder, $zip, $subfolderPath);
             }
         }
+    }
+
+    public function generateReport(Request $request)
+    {
+        $user = auth()->user();
+        $user->load(['department', 'designation']);
+
+        $checkedBy = User::with(['department', 'designation'])->where('id', $request->checked_by)->first();
+
+        $folders = Folder::with(['departments', 'fileUploads', 'subfolders.fileUploads'])->whereIn('id', $request->selected_folders)->get();
+
+        $effectiveDate = $request->effective_date;
+
+        $reportData = [
+            'user' => $user,
+            'checkedBy' => $checkedBy,
+            'folders' => $folders,
+            'effectiveDate' => $effectiveDate,
+        ];
+ 
+        $pdf = PDF::loadView('report', ['reportData' => $reportData]);
+
+        return $pdf->download('records_digitization_report.pdf');
     }
 }

@@ -15,18 +15,19 @@ class DesignationController extends Controller
     {
         $pageSize = $request->input('page_size');
         $filter = $request->input('filter');
-        $sortColumn = $request->input('sort_column', 'folder_name');
+        $sortColumn = $request->input('sort_column', 'designation');
         $sortDesc = $request->input('sort_desc', false) ? 'desc' : 'asc';
 
         $query = Designation::query();
 
         if ($filter) {
             $query->where(function ($q) use ($filter) {
-                $q->where('name', 'like', "%{$filter}%");
+                $q->where('designation', 'like', "%{$filter}%")
+                    ->orWhere('description', 'like', "%{$filter}%");
             });
         }
 
-        if (in_array($sortColumn, ['name',])) {
+        if (in_array($sortColumn, ['designation', 'description'])) {
             $query->orderBy($sortColumn, $sortDesc);
         }
 

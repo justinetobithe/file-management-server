@@ -13,7 +13,7 @@ class Folder extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['activity_log'];
+    protected $appends = ['activity_log', 'total_size'];
 
     public function subfolders()
     {
@@ -33,5 +33,26 @@ class Folder extends Model
     public function departments()
     {
         return $this->belongsToMany(Department::class, 'folder_access_controls')->withTimestamps();
+    }
+
+    public function getTotalSizeAttribute()
+    {
+        $totalSize = 0;
+
+        foreach ($this->fileUploads as $file) {
+            $totalSize += $file->size ?? 0;
+        }
+
+        if ($totalSize < 1024) {
+            return number_format($totalSize, 2) . " bytes";
+        } elseif ($totalSize < 1048576) {
+            return number_format($totalSize / 1024, 2) . " KB";
+        } elseif ($totalSize < 1073741824) {
+            return number_format($totalSize / 1048576, 2) . " MB";
+        } elseif ($totalSize < 1099511627776) {
+            return number_format($totalSize / 1073741824, 2) . " GB";
+        } else {
+            return number_format($totalSize / 1099511627776, 2) . " TB";
+        }
     }
 }

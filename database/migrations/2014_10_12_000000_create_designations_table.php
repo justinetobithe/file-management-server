@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('designation')->unique();
             $table->text('description')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
