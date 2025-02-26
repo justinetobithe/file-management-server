@@ -29,6 +29,7 @@ class FolderController extends Controller
         $filter = $request->input('filter');
         $sortColumn = $request->input('sort_column', 'name');
         $sortDesc = $request->input('sort_desc', false) ? 'desc' : 'asc';
+        $departmentId = $request->input('department_id');
 
         $query = Folder::with(['subfolders', 'fileUploads', 'departments']);
 
@@ -43,6 +44,12 @@ class FolderController extends Controller
                     ->orWhereHas('subfolders', function ($q) use ($filter) {
                         $q->where('folder_name', 'like', "%{$filter}%");
                     });
+            });
+        }
+
+        if ($departmentId) {
+            $query->whereHas('departments', function ($q) use ($departmentId) {
+                $q->where('departments.id', $departmentId);
             });
         }
 
@@ -65,7 +72,6 @@ class FolderController extends Controller
                 }
             }
         }
-
 
         if ($pageSize) {
             $folders = $query->paginate($pageSize);
@@ -256,7 +262,7 @@ class FolderController extends Controller
             'folders' => $folders,
             'effectiveDate' => $effectiveDate,
         ];
- 
+
         $pdf = PDF::loadView('report', ['reportData' => $reportData]);
 
         return $pdf->download('records_digitization_report.pdf');

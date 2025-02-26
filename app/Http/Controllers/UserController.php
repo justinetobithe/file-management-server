@@ -65,15 +65,12 @@ class UserController extends Controller
                 'message' => 'Role added to existing user.',
                 'data' => $existingUser,
             ]);
-
-            return response()->json([
-                'status' => 'error',
-                'message' => __('messages.errors.email_exists'),
-                'data' => $existingUser,
-            ]);
         }
 
-        $user = User::create($request->all());
+        $userData = $request->all();
+        $userData['password'] = Hash::make($request->password);
+
+        $user = User::create($userData);
 
         return response()->json([
             'status' => 'success',
@@ -81,6 +78,7 @@ class UserController extends Controller
             'user' => $user,
         ]);
     }
+
 
     public function update(UserRequest $request, string $id)
     {

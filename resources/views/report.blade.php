@@ -51,6 +51,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
             font-size: 12px;
             margin-top: 10px;
         }
@@ -60,19 +61,33 @@
             border: 1px solid #ccc;
             padding: 5px;
             text-align: left;
-        }
-
-        th {
-            background-color: #e5e7eb;
-            color: #333;
-        }
-
-        td {
             word-wrap: break-word;
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 150px;
         }
+
+        tbody {
+            display: block;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        thead,
+        tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        th {
+            background-color: #e5e7eb;
+            color: #333;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
 
         .signature-section {
             display: flex;
@@ -127,7 +142,7 @@
 
         <div class="header">
             <div class="logo">
-                <img src="{{ asset('http://127.0.0.1:8000/img/logo.png') }}" alt="PAGCOR Logo">
+                <img src="https://pagcor-file-management.site/img/logo.png" alt="PAGCOR Logo">
             </div>
             <div class="title">
                 <div class="header-title">Records Digitization Monitoring Form</div>
