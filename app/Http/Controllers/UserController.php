@@ -57,13 +57,10 @@ class UserController extends Controller
 
     public function store(UserRequest $request)
     {
-        $existingUser = User::where('email', $request->email)->first();
-
-        if ($existingUser) {
+        if (User::where('email', $request->email)->exists()) {
             return response()->json([
-                'status' => 'success',
-                'message' => 'Role added to existing user.',
-                'data' => $existingUser,
+                'status' => 'error',
+                'message' => 'A user with this email already exists.',
             ]);
         }
 
@@ -83,6 +80,15 @@ class UserController extends Controller
     public function update(UserRequest $request, string $id)
     {
         $user = User::findOrFail($id);
+
+        if ($request->email && $request->email !== $user->email) {
+            if (User::where('email', $request->email)->where('id', '!=', $id)->exists()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'This email is already in use by another user.',
+                ]);
+            }
+        }
 
         if ($request->filled('current_password')) {
             if (!Hash::check($request->current_password, $user->password)) {
@@ -114,9 +120,19 @@ class UserController extends Controller
         ]);
     }
 
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         $user = User::findOrFail($id);
+
+        if ($request->filled('password')) {
+            if (!Hash::check($request->password, $user->password)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Password is incorrect.',
+                ], 403);
+            }
+        }
+
         $user->delete();
 
         return response()->json([

@@ -38,7 +38,7 @@ class AuthController extends Controller
 
         $validated['password'] = Hash::make($validated['password']);
 
-        $user = User::create($validated); 
+        $user = User::create($validated);
 
         return response()->json([
             'status' => true,
@@ -49,6 +49,24 @@ class AuthController extends Controller
 
     public function login(AuthLoginRequest $request)
     {
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => __('messages.errors.user_not_found'),
+                'data' => null
+            ]);
+        }
+
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => __('messages.errors.incorrect_password'),
+                'data' => null
+            ]);
+        }
+
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $user = auth()->user();
             $token = $user->generateToken();
@@ -71,6 +89,7 @@ class AuthController extends Controller
             'data' => null
         ]);
     }
+
 
     public function logout(Request $request)
     {

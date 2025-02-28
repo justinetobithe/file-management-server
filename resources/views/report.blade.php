@@ -182,12 +182,13 @@
                             @foreach($folder['subfolders'] as $subfolder)
                             <li class="subfolder-item">
                                 <div class="subfolder-name">
-                                    {{ $subfolder['folder_name'] }}
+                                    {{ wordwrap($subfolder['folder_name'], 30, "<br>", true) }}
                                 </div>
                             </li>
                             @endforeach
                         </ul>
                     </td>
+
                     <td>
                         <ul class="subfolder-list">
                             @foreach($folder['subfolders'] as $subfolder)

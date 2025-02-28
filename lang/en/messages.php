@@ -14,7 +14,7 @@ return [
         'status_updated' => 'Status updated successfully!',
         'attendance_record_created' => 'Attendance record successfully created. Time In set to now.',
         'time_out_updated' => 'Time Out updated successfully.',
-        'zip_created' => 'ZIP file created successfully!',  
+        'zip_created' => 'ZIP file created successfully!',
     ],
     'invalid' => [
         'credentials' => 'Invalid Credentials!',
@@ -30,5 +30,7 @@ return [
         'already_checked_in_and_out_today' => 'Student has already checked in and out today.',
         'max_checkins_today' => 'The student has reached the maximum allowed check-ins for today.',
         'unknown_error' => 'An unknown error occurred. Please try again later.',
+        'user_not_found' => 'Account does not exist. Please check your email.',
+        'incorrect_password' => 'Incorrect password. Please try again.',
     ]
 ];
