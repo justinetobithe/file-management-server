@@ -33,35 +33,28 @@
         }
 
         .logo {
-            flex: 0 0 auto;
+            flex: 0 0 120px;
         }
 
         .title {
             flex: 1;
             text-align: center;
-        }
-
-        .header-info {
-            flex: 0 0 auto;
-            text-align: right;
-        }
-
-
-        .header img {
-            width: 120px;
-            height: 120px;
-        }
-
-        .header-title {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             text-transform: uppercase;
         }
 
         .header-info {
-            font-size: 12px;
+            flex: 0 0 auto;
             text-align: right;
+            font-size: 12px;
         }
+
+        .header img {
+            width: 100px;
+            height: auto;
+        }
+
 
         table {
             width: 100%;
