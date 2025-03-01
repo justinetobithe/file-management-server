@@ -32,18 +32,23 @@
             margin-bottom: 15px;
         }
 
-        .logo {
-            flex: 0 0 auto;
-        }
-
-        .title {
+        .header>div {
             flex: 1;
             text-align: center;
         }
 
+        .logo img {
+            max-width: 100px;
+            height: auto;
+        }
+
         .header-info {
-            font-size: 12px;
             text-align: right;
+            font-size: 12px;
+        }
+
+        .header-info p {
+            margin: 2px 0;
         }
 
         table {
@@ -138,10 +143,10 @@
 
         <div class="header">
             <div class="logo">
-                <img src="{{ public_path('img/logo.png') }}" alt="Logo" width="150" height="150">
+                <img src="{{ public_path('img/logo.png') }}" alt="Logo">
             </div>
             <div class="title">
-                <div class="header-title">Records Digitization Monitoring Form</div>
+                <h2>Records Digitization Monitoring Form</h2>
             </div>
             <div class="header-info">
                 <p><strong>Page No.:</strong> Page 1 of 1</p>
