@@ -25,19 +25,15 @@
 
         .header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 10px;
+            align-items: center;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .logo {
-            flex: 0 0 100px;
-            text-align: left;
-        }
-
-        .logo img {
-            max-width: 100%;
-            height: auto;
+            flex: 0 0 auto;
         }
 
         .title {
@@ -46,9 +42,25 @@
         }
 
         .header-info {
-            flex: 0 0 200px;
+            flex: 0 0 auto;
             text-align: right;
+        }
+
+
+        .header img {
+            width: 120px;
+            height: 120px;
+        }
+
+        .header-title {
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .header-info {
             font-size: 12px;
+            text-align: right;
         }
 
         table {
@@ -143,10 +155,10 @@
 
         <div class="header">
             <div class="logo">
-                <img src="{{ public_path('img/logo.png') }}" alt="Logo">
+                <img src="{{ public_path('img/logo.png') }}" alt="Logo" width="100" height="100">
             </div>
             <div class="title">
-                <h2>Records Digitization Monitoring Form</h2>
+                <div class="header-title">Records Digitization Monitoring Form</div>
             </div>
             <div class="header-info">
                 <p><strong>Page No.:</strong> Page 1 of 1</p>
