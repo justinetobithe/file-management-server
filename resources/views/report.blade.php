@@ -25,30 +25,30 @@
 
         .header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #ccc;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            justify-content: space-between;
+            gap: 10px;
         }
 
-        .header>div {
+        .logo {
+            flex: 0 0 100px;
+            text-align: left;
+        }
+
+        .logo img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .title {
             flex: 1;
             text-align: center;
         }
 
-        .logo img {
-            max-width: 100px;
-            height: auto;
-        }
-
         .header-info {
+            flex: 0 0 200px;
             text-align: right;
             font-size: 12px;
-        }
-
-        .header-info p {
-            margin: 2px 0;
         }
 
         table {
