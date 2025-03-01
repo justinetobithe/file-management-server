@@ -140,7 +140,11 @@
 
         <div class="header">
             <div class="logo">
-                <img src="https://pagcor-file-management.site/img/logo.png" alt="Logo"> 
+                <img src="https://pagcor-file-management.site/img/logo.png" alt="Logo">
+                <img src="{{ public_path('img/logo.png') }}" alt="Logo" width="150" height="150">
+                <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('img/logo.png'))) }}">
+
+
             </div>
             <div class="title">
                 <div class="header-title">Records Digitization Monitoring Form</div>
