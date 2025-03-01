@@ -140,10 +140,7 @@
 
         <div class="header">
             <div class="logo">
-                <img src="{{ public_path('images/logo.png') }}" style="width:100px;">
-                <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('images/logo.png'))) }}" />
-                <img src="{{ asset('images/logo.png') }}">
-
+                <img src="https://pagcor-file-management.site/img/logo.png" alt="PAGCOR Logo" width="150" height="150" />
 
             </div>
             <div class="title">
