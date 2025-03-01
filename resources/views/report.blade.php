@@ -87,7 +87,7 @@
             top: 0;
             z-index: 2;
         }
- 
+
         .signature-section {
             display: flex;
             justify-content: space-between;
@@ -119,7 +119,7 @@
             display: flex;
             justify-content: space-between;
             border: 1px solid #ccc;
-            padding: 5px; 
+            padding: 5px;
             align-items: center;
         }
 
@@ -141,7 +141,7 @@
         <div class="header">
             <div class="logo">
                 <!-- <img src="https://pagcor-file-management.site/img/logo.png" alt="PAGCOR Logo" width="150" height="150"> -->
-                <img src="{{ asset('img/logo.png') }}" alt="PAGCOR Logo" width="150" height="150">
+                <img src="{{ url('img/logo.png') }}" alt="PAGCOR Logo" width="150" height="150"> 
             </div>
             <div class="title">
                 <div class="header-title">Records Digitization Monitoring Form</div>
