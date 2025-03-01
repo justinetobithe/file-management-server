@@ -32,15 +32,13 @@
             margin-bottom: 15px;
         }
 
-        .header img {
-            width: 120px;
-            height: 120px;
+        .logo {
+            flex: 0 0 auto;
         }
 
-        .header-title {
-            font-size: 16px;
-            font-weight: bold;
-            text-transform: uppercase;
+        .title {
+            flex: 1;
+            text-align: center;
         }
 
         .header-info {
