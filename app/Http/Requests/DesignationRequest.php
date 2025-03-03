@@ -22,7 +22,7 @@ class DesignationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'designation' => 'required|string|max:255',
+            'designation' => 'required|string',
             'description' => 'nullable|string',
         ];
     }
