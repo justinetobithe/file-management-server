@@ -23,7 +23,7 @@ class FolderRequest extends FormRequest
     {
         return [
             'folder_name' => 'required|string|max:255',
-            'local_path' => 'nullable|string|max:255',
+            // 'local_path' => 'nullable|string|max:255',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
             'parent_id' => 'nullable|exists:folders,id',

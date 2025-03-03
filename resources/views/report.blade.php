@@ -195,7 +195,7 @@
                     <th>Folder Name (Main)</th>
                     <th>Folder Name (Sub)</th>
                     <th>Size</th>
-                    <th>Folder Location</th>
+                    <!-- <th>Folder Location</th> -->
                     <th>Coverage Period</th>
                 </tr>
             </thead>
@@ -234,7 +234,7 @@
                         </ul>
                     </td>
 
-                    <td>{{ $folder['local_path'] }}</td>
+                    <!-- <td>{{ $folder['local_path'] }}</td> -->
 
                     <td>
                         {{ \Carbon\Carbon::parse($folder['start_date'])->format('M. d, Y') }} –
