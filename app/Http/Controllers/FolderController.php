@@ -25,6 +25,7 @@ class FolderController extends Controller
 
     public function index(Request $request)
     {
+        $user = auth()->user();
         $pageSize = $request->input('page_size');
         $filter = $request->input('filter');
         $sortColumn = $request->input('sort_column', 'name');
@@ -32,6 +33,21 @@ class FolderController extends Controller
         $departmentId = $request->input('department_id');
 
         $query = Folder::with(['subfolders', 'fileUploads', 'departments']);
+
+        if ($user->role === 'admin') {
+        } else {
+            if ($departmentId) {
+                $query->whereHas('departments', function ($q) use ($departmentId) {
+                    $q->where('departments.id', $departmentId);
+                });
+            } elseif ($user->departments && $user->departments->isNotEmpty()) {
+                $query->whereHas('departments', function ($q) use ($user) {
+                    $q->whereIn('departments.id', $user->departments->pluck('id')->toArray());
+                });
+            } else {
+                $query->where('added_by', $user->id);
+            }
+        }
 
         if ($filter) {
             $query->where(function ($q) use ($filter) {
@@ -44,12 +60,6 @@ class FolderController extends Controller
                     ->orWhereHas('subfolders', function ($q) use ($filter) {
                         $q->where('folder_name', 'like', "%{$filter}%");
                     });
-            });
-        }
-
-        if ($departmentId) {
-            $query->whereHas('departments', function ($q) use ($departmentId) {
-                $q->where('departments.id', $departmentId);
             });
         }
 
@@ -75,7 +85,6 @@ class FolderController extends Controller
 
         if ($pageSize) {
             $folders = $query->paginate($pageSize);
-
             $folders->getCollection()->transform(function ($folder) {
                 $folder->files = $folder->fileUploads;
                 unset($folder->fileUploads);
@@ -87,6 +96,7 @@ class FolderController extends Controller
 
         return $this->success($folders);
     }
+
 
     public function show(string $id)
     {
@@ -106,6 +116,8 @@ class FolderController extends Controller
         $validatedData = $request->validated();
 
         unset($validatedData['uploaded_files']);
+
+        $validatedData['added_by'] = auth()->id();
 
         $folder = Folder::create($validatedData);
 

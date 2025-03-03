@@ -40,6 +40,8 @@ Route::middleware('auth:sanctum', 'throttle:60,1')->group(function () {
         Route::post('/', [UserController::class, 'store']);
         Route::get('/{user}', [UserController::class, 'show']);
         Route::delete('/{user}', [UserController::class, 'destroy']);
+
+        Route::post('/{id}/reset-password', [UserController::class, 'resetPassword']);
     });
 
     Route::prefix('activitylogs')->group(function () {

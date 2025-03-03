@@ -23,38 +23,48 @@
             box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #ccc;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #000;
         }
 
-        .logo {
-            flex: 0 0 120px;
-        }
-
-        .title {
-            flex: 1;
+        .header-table td {
+            border: 1px solid #000;
+            padding: 10px;
             text-align: center;
+        }
+
+        .header-logo {
+            width: 120px;
+            text-align: center;
+        }
+
+        .header-logo img {
+            width: 80px;
+            height: auto;
+        }
+
+        .header-title {
             font-size: 18px;
             font-weight: bold;
             text-transform: uppercase;
         }
 
         .header-info {
-            flex: 0 0 auto;
-            text-align: right;
             font-size: 12px;
+            text-align: left;
         }
 
-        .header img {
-            width: 100px;
-            height: auto;
+        .header-info td {
+            text-align: left;
+            padding: 5px;
         }
 
+        .header-info strong {
+            display: inline-block;
+            width: 90px;
+        }
 
         table {
             width: 100%;
@@ -146,20 +156,37 @@
 
     <div class="container">
 
-        <div class="header">
-            <div class="logo">
-                <img src="{{ public_path('img/logo.png') }}" alt="Logo" width="100" height="100">
-            </div>
-            <div class="title">
-                <div class="header-title">Records Digitization Monitoring Form</div>
-            </div>
-            <div class="header-info">
-                <p><strong>Page No.:</strong> Page 1 of 1</p>
-                <p><strong>Form No.:</strong> RMD - 409</p>
-                <p><strong>Revision No.:</strong> 2</p>
-                <p><strong>Effectivity:</strong> {{ \Carbon\Carbon::parse($reportData['effectiveDate'])->format('M. d, Y') }}</p>
-            </div>
-        </div>
+        <table class="header-table">
+            <tr>
+                <td class="header-logo">
+                    <img src="{{ public_path('img/logo.png') }}" alt="Logo">
+                    <br>PAGCOR
+                </td>
+                <td class="header-title">
+                    RECORDS DIGITIZATION <br> MONITORING FORM
+                </td>
+                <td class="header-info">
+                    <table>
+                        <tr>
+                            <td><strong>Page No.:</strong></td>
+                            <td>Page 1 of 1</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Form No.:</strong></td>
+                            <td>RMD - 409</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Revision No.:</strong></td>
+                            <td>2</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Effectivity:</strong></td>
+                            <td>{{ \Carbon\Carbon::parse($reportData['effectiveDate'])->format('M. d, Y') }}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
 
         <table>
             <thead>

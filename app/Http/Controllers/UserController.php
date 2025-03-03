@@ -141,4 +141,20 @@ class UserController extends Controller
             'user' => $user,
         ]);
     }
+
+    public function resetPassword(Request $request, string $id)
+    {
+        $request->validate([
+            'new_password' => 'required|min:6',
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Password has been reset successfully.',
+        ]);
+    }
 }

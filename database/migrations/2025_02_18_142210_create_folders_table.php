@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             $table->foreignId('parent_id')->nullable()->constrained('folders')->onDelete('cascade');
+            $table->foreignId('added_by')->nullable()->constrained('users')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -30,6 +30,7 @@ class FolderRequest extends FormRequest
 
             'department_id' => 'nullable|array',
             'department_id.*' => 'exists:departments,id',
+            'user_id.*' => 'exists:users,id',
 
             'current_files' => 'nullable|string',
             'uploaded_files.*' => 'nullable|file|max:20480',
