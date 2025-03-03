@@ -47,6 +47,21 @@ class DesignationController extends Controller
 
     public function store(DesignationRequest $request)
     {
+        $existingDesignation = Designation::withTrashed()
+            ->where('designation', $request->designation)
+            ->first();
+
+        if ($existingDesignation) {
+            $existingDesignation->restore();
+            $existingDesignation->update($request->all());
+
+            return response()->json([
+                'status' => 'success',
+                'message' => __('messages.success.restored'),
+                'data' => $existingDesignation,
+            ]);
+        }
+
         $designation = Designation::create($request->all());
 
         return response()->json([
@@ -55,6 +70,7 @@ class DesignationController extends Controller
             'data' => $designation,
         ]);
     }
+
 
     public function update(DesignationRequest $request, string $id)
     {
