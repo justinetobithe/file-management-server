@@ -6,6 +6,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DesignationController;
 use App\Http\Controllers\FolderController;
 use App\Http\Controllers\MeController;
+use App\Http\Controllers\PositionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -74,5 +75,11 @@ Route::middleware('auth:sanctum', 'throttle:60,1')->group(function () {
         Route::post('/', [DesignationController::class, 'store']);
         Route::get('/{designation}', [DesignationController::class, 'show']);
         Route::delete('/{designation}', [DesignationController::class, 'destroy']);
+    });
+
+    Route::prefix('/position')->group(function () {
+        Route::post('/', [PositionController::class, 'store']);
+        Route::put('/{id}', [PositionController::class, 'update']);
+        Route::delete('/{id}', [PositionController::class, 'destroy']);
     });
 });

@@ -24,8 +24,14 @@ class UserResource extends JsonResource
             'address' => $this->address,
             'role' => $this->role,
             'image' => $this->image,
-            'department_id' => $this->department_id,
-            'designation_id' => $this->designation_id,
+            'position' => $this->whenLoaded('position', function () {
+                return [
+                    'department_id' => $this->position->department_id,
+                    'department' => $this->position->department->name,
+                    'designation_id' => $this->position->designation_id,
+                    'designation' => $this->position->designation->designation,
+                ];
+            }),
         ];
     }
 }

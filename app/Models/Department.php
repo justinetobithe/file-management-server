@@ -12,11 +12,16 @@ class Department extends Model
     use HasFactory, SoftDeletes, ActivityLoggable;
 
     protected $guarded = ['id'];
- 
+
     protected $appends = ['activity_log'];
 
     public function folders()
     {
         return $this->belongsToMany(Folder::class, 'folder_access_controls');
+    }
+
+    public function positions()
+    {
+        return $this->hasMany(Position::class);
     }
 }

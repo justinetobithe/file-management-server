@@ -15,8 +15,8 @@ class Designation extends Model
 
     protected $appends = ['activity_log'];
 
-    public function designation()
+    public function positions()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasMany(Position::class);
     }
 }

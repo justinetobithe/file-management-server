@@ -108,13 +108,15 @@
 
         .signature-section {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
+            gap: 50px;
             margin-top: 20px;
             font-size: 12px;
         }
 
         .signature-box {
-            width: 45%;
+            width: 250px;
+            text-align: center;
         }
 
         .signature-box p {
@@ -148,6 +150,10 @@
         .subfolder-size {
             text-align: right;
             min-width: 80px;
+        }
+
+        .text-left {
+            text-align: "left";
         }
     </style>
 </head>
@@ -248,17 +254,30 @@
         <div class="signature-section">
             <div class="signature-box">
                 <p class="bold">Prepared By:</p>
-                <p>{{ $reportData['user']['first_name'] }} {{ $reportData['user']['last_name'] }}</p>
-                <p>{{ $reportData['user']['designation']['designation'] ?? '' }}</p>
-                <p>Date: _______________</p>
+                <p class="text-left">Name: {{ $reportData['user']['first_name'] }} {{ $reportData['user']['last_name'] }}</p>
+                <p class="text-left">
+                    {{ $reportData['user']['department']['name'] ?? '' }}
+                    @if(!empty($reportData['user']['department']['name']) && !empty($reportData['user']['designation']['designation']))
+                    |
+                    @endif
+                    {{ $reportData['user']['designation']['designation'] ?? '' }}
+                </p>
+                <p class="text-left">Date: _______________</p>
             </div>
             <div class="signature-box">
                 <p class="bold">Checked By:</p>
-                <p>{{ $reportData['checkedBy']['first_name'] }} {{ $reportData['checkedBy']['last_name'] }}</p>
-                <p>{{ $reportData['checkedBy']['designation']['designation'] ?? '' }}</p>
-                <p>Date: _______________</p>
+                <p class="text-left">Name: {{ $reportData['checkedBy']['first_name'] ?? '' }} {{ $reportData['checkedBy']['last_name'] ?? '' }}</p>
+                <p class="text-left">
+                    {{ $reportData['checkedBy']['department']['name'] ?? '' }}
+                    @if(!empty($reportData['checkedBy']['department']['name']) && !empty($reportData['checkedBy']['designation']['designation']))
+                    |
+                    @endif
+                    {{ $reportData['checkedBy']['designation']['designation'] ?? '' }}
+                </p>
+                <p class="text-left">Date: _______________</p>
             </div>
         </div>
+
     </div>
 
 </body>

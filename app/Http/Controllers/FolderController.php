@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\FolderRequest;
 use App\Models\Folder;
+use App\Models\Position;
 use App\Models\User;
 use App\Services\FileUploadService;
 use App\Traits\ApiResponse;
@@ -47,6 +48,11 @@ class FolderController extends Controller
             } else {
                 $query->where('added_by', $user->id);
             }
+        }
+
+        $allFolders = filter_var($request->input('all_folders', false), FILTER_VALIDATE_BOOLEAN);
+        if (!$allFolders) {
+            $query->whereNull('parent_id');
         }
 
         if ($filter) {
@@ -260,11 +266,29 @@ class FolderController extends Controller
     public function generateReport(Request $request)
     {
         $user = auth()->user();
-        $user->load(['department', 'designation']);
+        $user->load(['position.department', 'position.designation']);
 
-        $checkedBy = User::with(['department', 'designation'])->where('id', $request->checked_by)->first();
+        $departmentId = $request->department_id;
 
-        $folders = Folder::with(['departments', 'fileUploads', 'subfolders.fileUploads'])->whereIn('id', $request->selected_folders)->get();
+        $positions = Position::where('department_id', $departmentId)->get();
+
+        $sectionHead = $positions->where('section_head', true)->first();
+
+        if ($sectionHead) {
+            $checkedBy = User::whereHas('position', function ($query) use ($sectionHead) {
+                $query->where('id', $sectionHead->id);
+            })->with(['position.department', 'position.designation'])->first();
+        } else {
+            $checkedBy = User::whereHas('position', function ($query) use ($departmentId) {
+                $query->where('department_id', $departmentId);
+            })->with(['position.department', 'position.designation'])->first();
+        }
+
+        $checkedBy = $checkedBy ?? null;
+
+        $folders = Folder::with(['departments', 'fileUploads', 'subfolders.fileUploads'])
+            ->whereIn('id', $request->selected_folders)
+            ->get();
 
         $effectiveDate = $request->effective_date;
 
@@ -274,6 +298,8 @@ class FolderController extends Controller
             'folders' => $folders,
             'effectiveDate' => $effectiveDate,
         ];
+
+        // return $reportData;
 
         $pdf = PDF::loadView('report', ['reportData' => $reportData]);
 

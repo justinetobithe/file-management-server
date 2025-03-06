@@ -22,8 +22,8 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->enum('role', ['user', 'admin'])->default('user');
             $table->string('image')->nullable();
-            $table->foreignId('department_id')->nullable()->constrained('departments')->onDelete('cascade');
-            $table->foreignId('designation_id')->nullable()->constrained('designations')->onDelete('cascade');
+            // $table->foreignId('department_id')->nullable()->constrained('departments')->onDelete('cascade');
+            // $table->foreignId('designation_id')->nullable()->constrained('designations')->onDelete('cascade');
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

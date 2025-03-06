@@ -31,8 +31,8 @@ class UserRequest extends FormRequest
             'role' => 'required|in:user,admin',
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
             'status' => 'nullable|integer|in:0,1',
-            'department_id' => 'nullable|exists:departments,id',
-            'designation_id' => 'nullable|exists:designations,id',
+            // 'department_id' => 'nullable|exists:departments,id',
+            // 'designation_id' => 'nullable|exists:designations,id',
 
             'current_password' => 'sometimes|nullable|string|min:8',
         ];

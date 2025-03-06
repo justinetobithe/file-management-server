@@ -9,6 +9,8 @@ class MeController extends Controller
 {
     public function __invoke(Request $request)
     {
-        return new UserResource($request->user());
+        $user = $request->user()->load('position.department', 'position.designation');
+
+        return new UserResource($user);
     }
 }

@@ -44,14 +44,9 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function department()
+    public function position()
     {
-        return $this->belongsTo(Department::class);
-    }
-
-    public function designation()
-    {
-        return $this->belongsTo(Designation::class);
+        return $this->hasOne(Position::class);
     }
 
     public function generateToken()

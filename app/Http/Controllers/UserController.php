@@ -19,7 +19,7 @@ class UserController extends Controller
         $sortColumn = $request->input('sort_column', 'first_name');
         $sortDesc = $request->input('sort_desc', false) ? 'desc' : 'asc';
 
-        $query = User::with('department');
+        $query = User::with(['position.department', 'position.designation']);
 
         if ($filter) {
             $query->where(function ($q) use ($filter) {
@@ -47,7 +47,7 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        $user->load('department');
+        $user->load(['position.department', 'position.designation']);
 
         return $this->success([
             'status' => true,
