@@ -28,9 +28,10 @@ class FolderController extends Controller
     {
         $user = auth()->user();
         $pageSize = $request->input('page_size');
+        $search = $request->input('search');
         $filter = $request->input('filter');
-        $sortColumn = $request->input('sort_column', 'name');
-        $sortDesc = $request->input('sort_desc', false) ? 'desc' : 'asc';
+        $sortBy = $request->input('sort_by', 'date_upload');
+        $sortDesc = filter_var($request->input('sort_desc', false), FILTER_VALIDATE_BOOLEAN) ? 'desc' : 'asc';
         $departmentId = $request->input('department_id');
 
         $query = Folder::with(['subfolders', 'fileUploads', 'departments', 'addedBy']);
@@ -55,35 +56,38 @@ class FolderController extends Controller
             $query->whereNull('parent_id');
         }
 
-        if ($filter) {
-            $query->where(function ($q) use ($filter) {
-                $q->where('folder_name', 'like', "%{$filter}%")
-                    ->orWhere('local_path', 'like', "%{$filter}%")
-                    ->orWhereDate('created_at', $filter)
-                    ->orWhereHas('departments', function ($q) use ($filter) {
-                        $q->where('name', 'like', "%{$filter}%");
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('folder_name', 'like', "%{$search}%")
+                    ->orWhere('local_path', 'like', "%{$search}%")
+                    ->orWhereDate('created_at', $search)
+                    ->orWhereHas('departments', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
                     })
-                    ->orWhereHas('subfolders', function ($q) use ($filter) {
-                        $q->where('folder_name', 'like', "%{$filter}%");
+                    ->orWhereHas('subfolders', function ($q) use ($search) {
+                        $q->where('folder_name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('fileUploads', function ($q) use ($search) {
+                        $q->where('filename', 'like', "%{$search}%");
                     });
             });
         }
 
-        if ($sortColumn && $sortDesc) {
+        if ($sortBy && $sortDesc) {
             $sortableFields = ['date_upload', 'folder_name', 'sub_folders', 'local_path'];
 
-            if (in_array($sortColumn, $sortableFields)) {
+            if (in_array($sortBy, $sortableFields)) {
                 $sortOrder = in_array($sortDesc, ['asc', 'desc']) ? $sortDesc : 'asc';
 
-                if ($sortColumn === 'date_upload') {
-                    $query->orderByRaw("DATE(created_at) $sortOrder");
-                } elseif ($sortColumn === 'folder_name') {
+                if ($sortBy === 'date_upload') {
+                    $query->orderBy('created_at', $sortOrder);
+                } elseif ($sortBy === 'folder_name') {
                     $query->orderByRaw("folder_name $sortOrder");
-                } elseif ($sortColumn === 'sub_folders') {
+                } elseif ($sortBy === 'sub_folders') {
                     $query->with(['subfolders' => function ($q) use ($sortOrder) {
                         $q->orderBy('folder_name', $sortOrder);
                     }])->orderBy('folder_name', $sortOrder);
-                } elseif ($sortColumn === 'local_path') {
+                } elseif ($sortBy === 'local_path') {
                     $query->orderBy('local_path', $sortOrder);
                 }
             }
