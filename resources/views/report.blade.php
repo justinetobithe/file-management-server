@@ -73,6 +73,9 @@
         }
 
         td ul {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
             list-style: none;
             padding: 0;
             margin: 0;
@@ -81,8 +84,8 @@
         td ul li {
             display: flex;
             justify-content: space-between;
+            width: 100%;
         }
-
 
         .signature-section {
             display: table;
@@ -172,14 +175,14 @@
                     <td>
                         <ul>
                             @foreach($folder['subfolders'] as $subfolder)
-                            <li>{{ wordwrap($subfolder['folder_name'], 30, "<br>", true) }}</li>
+                            <li><span>{{ wordwrap($subfolder['folder_name'], 30, "<br>", true) }}</span></li>
                             @endforeach
                         </ul>
                     </td>
                     <td>
                         <ul>
                             @foreach($folder['subfolders'] as $subfolder)
-                            <li>{{ $subfolder['total_size'] }}</li>
+                            <li><span>{{ $subfolder['total_size'] }}</span></li>
                             @endforeach
                         </ul>
                     </td>
