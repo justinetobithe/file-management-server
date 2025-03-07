@@ -33,7 +33,7 @@ class FolderController extends Controller
         $sortDesc = $request->input('sort_desc', false) ? 'desc' : 'asc';
         $departmentId = $request->input('department_id');
 
-        $query = Folder::with(['subfolders', 'fileUploads', 'departments']);
+        $query = Folder::with(['subfolders', 'fileUploads', 'departments', 'addedBy']);
 
         if ($user->role === 'admin') {
         } else {
@@ -268,7 +268,7 @@ class FolderController extends Controller
         $user = auth()->user();
         $user->load(['position.department', 'position.designation']);
 
-        $departmentId = $request->department_id;
+        $departmentId = $user->position->department->id;
 
         $positions = Position::where('department_id', $departmentId)->get();
 

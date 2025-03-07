@@ -35,11 +35,6 @@
             text-align: center;
         }
 
-        .header-logo {
-            width: 120px;
-            text-align: center;
-        }
-
         .header-logo img {
             width: 80px;
             height: auto;
@@ -49,21 +44,6 @@
             font-size: 18px;
             font-weight: bold;
             text-transform: uppercase;
-        }
-
-        .header-info {
-            font-size: 12px;
-            text-align: left;
-        }
-
-        .header-info td {
-            text-align: left;
-            padding: 5px;
-        }
-
-        .header-info strong {
-            display: inline-block;
-            width: 90px;
         }
 
         table {
@@ -82,20 +62,6 @@
             word-wrap: break-word;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 150px;
-        }
-
-        tbody {
-            display: block;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        thead,
-        tbody tr {
-            display: table;
-            width: 100%;
-            table-layout: fixed;
         }
 
         th {
@@ -106,17 +72,36 @@
             z-index: 2;
         }
 
-        .signature-section {
+        td ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        td ul li {
             display: flex;
-            justify-content: center;
-            gap: 50px;
-            margin-top: 20px;
-            font-size: 12px;
+            justify-content: space-between;
+        }
+
+
+        .signature-section {
+            display: table;
+            width: 100%;
+            margin-top: 30px;
+            page-break-before: avoid;
+        }
+
+        .signature-row {
+            display: table-row;
         }
 
         .signature-box {
-            width: 250px;
-            text-align: center;
+            display: table-cell;
+            width: 50%;
+            text-align: left;
+            vertical-align: top;
+            padding: 20px;
+            font-size: 14px;
         }
 
         .signature-box p {
@@ -125,35 +110,6 @@
 
         .bold {
             font-weight: bold;
-        }
-
-        .subfolder-list {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-wrap: wrap;
-        }
-
-        .subfolder-item {
-            display: flex;
-            justify-content: space-between;
-            border: 1px solid #ccc;
-            padding: 5px;
-            align-items: center;
-        }
-
-        .subfolder-name {
-            flex: 1;
-        }
-
-        .subfolder-size {
-            text-align: right;
-            min-width: 80px;
-        }
-
-        .text-left {
-            text-align: "left";
         }
     </style>
 </head>
@@ -171,7 +127,7 @@
                 <td class="header-title">
                     RECORDS DIGITIZATION <br> MONITORING FORM
                 </td>
-                <td class="header-info">
+                <td>
                     <table>
                         <tr>
                             <td><strong>Page No.:</strong></td>
@@ -201,7 +157,6 @@
                     <th>Folder Name (Main)</th>
                     <th>Folder Name (Sub)</th>
                     <th>Size</th>
-                    <!-- <th>Folder Location</th> -->
                     <th>Coverage Period</th>
                 </tr>
             </thead>
@@ -213,35 +168,21 @@
                         {{ $department['name'] }}@if(!$loop->last), @endif
                         @endforeach
                     </td>
-
                     <td>{{ $folder['folder_name'] }}</td>
-
                     <td>
-                        <ul class="subfolder-list">
+                        <ul>
                             @foreach($folder['subfolders'] as $subfolder)
-                            <li class="subfolder-item">
-                                <div class="subfolder-name">
-                                    {{ wordwrap($subfolder['folder_name'], 30, "<br>", true) }}
-                                </div>
-                            </li>
+                            <li>{{ wordwrap($subfolder['folder_name'], 30, "<br>", true) }}</li>
                             @endforeach
                         </ul>
                     </td>
-
                     <td>
-                        <ul class="subfolder-list">
+                        <ul>
                             @foreach($folder['subfolders'] as $subfolder)
-                            <li class="subfolder-item">
-                                <div class="subfolder-name">
-                                    {{ $subfolder['total_size'] }}
-                                </div>
-                            </li>
+                            <li>{{ $subfolder['total_size'] }}</li>
                             @endforeach
                         </ul>
                     </td>
-
-                    <!-- <td>{{ $folder['local_path'] }}</td> -->
-
                     <td>
                         {{ \Carbon\Carbon::parse($folder['start_date'])->format('M. d, Y') }} –
                         {{ \Carbon\Carbon::parse($folder['end_date'])->format('M. d, Y') }}
@@ -252,29 +193,34 @@
         </table>
 
         <div class="signature-section">
-            <div class="signature-box">
-                <p class="bold">Prepared By:</p>
-                <p class="text-left">Name: {{ $reportData['user']['first_name'] }} {{ $reportData['user']['last_name'] }}</p>
-                <p class="text-left">
-                    {{ $reportData['user']['department']['name'] ?? '' }}
-                    @if(!empty($reportData['user']['department']['name']) && !empty($reportData['user']['designation']['designation']))
-                    |
-                    @endif
-                    {{ $reportData['user']['designation']['designation'] ?? '' }}
-                </p>
-                <p class="text-left">Date: _______________</p>
-            </div>
-            <div class="signature-box">
-                <p class="bold">Checked By:</p>
-                <p class="text-left">Name: {{ $reportData['checkedBy']['first_name'] ?? '' }} {{ $reportData['checkedBy']['last_name'] ?? '' }}</p>
-                <p class="text-left">
-                    {{ $reportData['checkedBy']['department']['name'] ?? '' }}
-                    @if(!empty($reportData['checkedBy']['department']['name']) && !empty($reportData['checkedBy']['designation']['designation']))
-                    |
-                    @endif
-                    {{ $reportData['checkedBy']['designation']['designation'] ?? '' }}
-                </p>
-                <p class="text-left">Date: _______________</p>
+            <div class="signature-row">
+                <!-- Prepared By -->
+                <div class="signature-box">
+                    <p class="bold">Prepared By:</p>
+                    <p>Name: {{ $reportData['user']->first_name }} {{ $reportData['user']->last_name }}</p>
+                    <p>
+                        {{ $reportData['user']->position->department->name ?? 'N/A' }}
+                        @if(!empty($reportData['user']->position->department->name) && !empty($reportData['user']->position->designation->designation))
+                        |
+                        @endif
+                        {{ $reportData['user']->position->designation->designation ?? 'N/A' }}
+                    </p>
+                    <p>Date: _______________</p>
+                </div>
+
+                <!-- Checked By -->
+                <div class="signature-box">
+                    <p class="bold">Checked By:</p>
+                    <p>Name: {{ $reportData['checkedBy']->first_name ?? 'N/A' }} {{ $reportData['checkedBy']->last_name ?? '' }}</p>
+                    <p>
+                        {{ $reportData['checkedBy']->position->department->name ?? 'N/A' }}
+                        @if(!empty($reportData['checkedBy']->position->department->name) && !empty($reportData['checkedBy']->position->designation->designation))
+                        |
+                        @endif
+                        {{ $reportData['checkedBy']->position->designation->designation ?? 'N/A' }}
+                    </p>
+                    <p>Date: _______________</p>
+                </div>
             </div>
         </div>
 

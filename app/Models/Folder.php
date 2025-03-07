@@ -35,6 +35,11 @@ class Folder extends Model
         return $this->belongsToMany(Department::class, 'folder_access_controls')->withTimestamps();
     }
 
+    public function addedBy()
+    {
+        return $this->belongsTo(User::class, 'added_by', 'id');
+    }
+
     public function getTotalSizeAttribute()
     {
         $totalSize = 0;
