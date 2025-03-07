@@ -237,7 +237,7 @@ class FolderController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => __('messages.success.zip_created'),
-                'data' => asset('storage/temp/' . $zipFileName),
+                'data' => asset('storage/app/public/temp/' . $zipFileName),
             ]);
         } else {
             return response()->json(['status' => 'error', 'message' => 'Failed to create ZIP file.'], 500);
