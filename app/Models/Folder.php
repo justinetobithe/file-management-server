@@ -15,6 +15,10 @@ class Folder extends Model
 
     protected $appends = ['activity_log', 'total_size'];
 
+    protected $casts = [
+        'parent_id' => 'integer',
+    ];
+ 
     public function subfolders()
     {
         return $this->hasMany(Folder::class, 'parent_id');
