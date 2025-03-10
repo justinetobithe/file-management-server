@@ -94,14 +94,14 @@ class FolderController extends Controller
         }
 
         if ($pageSize) {
-            $folders = $query->paginate($pageSize);
+            $folders = $query->orderBy('created_at', 'desc')->paginate($pageSize);
             $folders->getCollection()->transform(function ($folder) {
                 $folder->files = $folder->fileUploads;
                 unset($folder->fileUploads);
                 return $folder;
             });
         } else {
-            $folders = $query->get();
+            $folders = $query->orderBy('created_at', 'desc')->get();
         }
 
         return $this->success($folders);
