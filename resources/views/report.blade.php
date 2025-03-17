@@ -180,7 +180,7 @@
                                 @if(!empty($subfolder['file_uploads']))
                                 <ul>
                                     @foreach($subfolder['file_uploads'] as $file)
-                                    <li>📄 {{ $file['name'] }}</li>
+                                    <li>📄 {{ $file['filename'] }}</li>
                                     @endforeach
                                 </ul>
                                 @endif
