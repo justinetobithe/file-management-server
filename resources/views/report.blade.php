@@ -175,7 +175,16 @@
                     <td>
                         <ul>
                             @foreach($folder['subfolders'] as $subfolder)
-                            <li><span>{{ wordwrap($subfolder['folder_name'], 30, "<br>", true) }}</span></li>
+                            <li>
+                                <span>{{ wordwrap($subfolder['folder_name'], 30, "<br>", true) }}</span>
+                                @if(!empty($subfolder['file_uploads']))
+                                <ul>
+                                    @foreach($subfolder['file_uploads'] as $file)
+                                    <li>📄 {{ $file['name'] }}</li>
+                                    @endforeach
+                                </ul>
+                                @endif
+                            </li>
                             @endforeach
                         </ul>
                     </td>

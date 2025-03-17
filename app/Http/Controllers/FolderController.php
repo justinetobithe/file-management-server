@@ -227,7 +227,8 @@ class FolderController extends Controller
             foreach ($folder->fileUploads as $file) {
                 $filePath = storage_path('app/public/uploads/' . basename($file->path));
                 if (file_exists($filePath)) {
-                    $zip->addFile($filePath, basename($filePath));
+                    // $zip->addFile($filePath, basename($filePath));
+                    $zip->addFile($filePath, $file->filename);
                 }
             }
 
@@ -238,6 +239,7 @@ class FolderController extends Controller
                 'status' => 'success',
                 'message' => __('messages.success.zip_created'),
                 'data' => asset('storage/app/public/temp/' . $zipFileName),
+                // 'data' => asset('storage/temp/' . $zipFileName),
             ]);
         } else {
             return response()->json(['status' => 'error', 'message' => 'Failed to create ZIP file.'], 500);
@@ -256,7 +258,8 @@ class FolderController extends Controller
             foreach ($subfolder->fileUploads as $file) {
                 $filePath = storage_path('app/public/uploads/' . basename($file->path));
                 if (file_exists($filePath)) {
-                    $zip->addFile($filePath, $subfolderPath . '/' . basename($filePath));
+                    // $zip->addFile($filePath, $subfolderPath . '/' . basename($filePath));
+                    $zip->addFile($filePath, $subfolderPath . '/' . $file->filename);
                 }
             }
 
