@@ -181,7 +181,7 @@
                             @endforeach
                         </ul>
                     </td>
-                    <td>
+                    <!-- <td>
                         <ul>
                             @foreach($folder['subfolders'] as $subfolder)
                             <li>
@@ -197,7 +197,7 @@
                             </li>
                             @endforeach
                         </ul>
-                    </td>
+                    </td> -->
 
                     <td>
                         <ul>
