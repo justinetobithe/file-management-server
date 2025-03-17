@@ -176,7 +176,7 @@
                         <ul>
                             @foreach($folder['subfolders'] as $subfolder)
                             <li>
-                                <span>{{ wordwrap($subfolder['folder_name'], 30, "<br>", true) }}</span>
+                                <!-- <span>{{ wordwrap($subfolder['folder_name'], 30, "<br>", true) }}</span> -->
                                 @if(!empty($subfolder['file_uploads']))
                                 <ul>
                                     @foreach($subfolder['file_uploads'] as $file)
