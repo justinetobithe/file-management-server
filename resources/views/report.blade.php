@@ -191,6 +191,21 @@
                     <td>
                         <ul>
                             @foreach($folder['subfolders'] as $subfolder)
+                            <li> 
+                                @if(!empty($subfolder['file_uploads']))
+                                <ul>
+                                    @foreach($subfolder['file_uploads'] as $file)
+                                    <li>📄 {{ $file['filename'] }}</li>
+                                    @endforeach
+                                </ul>
+                                @endif
+                            </li>
+                            @endforeach
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            @foreach($folder['subfolders'] as $subfolder)
                             <li><span>{{ $subfolder['total_size'] }}</span></li>
                             @endforeach
                         </ul>
