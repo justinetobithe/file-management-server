@@ -27,10 +27,13 @@ class FolderRequest extends FormRequest
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
             'parent_id' => 'nullable|exists:folders,id',
+            'department_id' => 'nullable|exists:departments,id',
 
-            'department_id' => 'nullable|array',
-            'department_id.*' => 'exists:departments,id',
+            // 'department_id' => 'nullable|array',
+            // 'department_id.*' => 'exists:departments,id',
             'user_id.*' => 'exists:users,id',
+
+            'status' => 'sometimes|in:approved,pending,rejected',
 
             'current_files' => 'nullable|string',
             'uploaded_files.*' => 'nullable|file|max:20480',

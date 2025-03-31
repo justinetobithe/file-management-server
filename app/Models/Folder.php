@@ -18,7 +18,7 @@ class Folder extends Model
     protected $casts = [
         'parent_id' => 'integer',
     ];
- 
+
     public function subfolders()
     {
         return $this->hasMany(Folder::class, 'parent_id');
@@ -29,15 +29,20 @@ class Folder extends Model
         return $this->belongsTo(Folder::class, 'parent_id');
     }
 
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
     public function fileUploads()
     {
         return $this->morphMany(FileUpload::class, 'uploadable');
     }
 
-    public function departments()
-    {
-        return $this->belongsToMany(Department::class, 'folder_access_controls')->withTimestamps();
-    }
+    // public function departments()
+    // {
+    //     return $this->belongsToMany(Department::class, 'folder_access_controls')->withTimestamps();
+    // }
 
     public function addedBy()
     {

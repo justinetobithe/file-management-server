@@ -67,6 +67,9 @@ Route::middleware('auth:sanctum', 'throttle:60,1')->group(function () {
 
         Route::get('/{id}/download', [FolderController::class, 'downloadZip']);
         Route::post('/generate-report', [FolderController::class, 'generateReport']);
+
+        Route::post('/{id}/approve', [FolderController::class, 'approve']);
+        Route::post('/{id}/reject', [FolderController::class, 'reject']);
     });
 
     Route::get('/designations', [DesignationController::class, 'index']);

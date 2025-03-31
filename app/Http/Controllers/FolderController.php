@@ -34,17 +34,17 @@ class FolderController extends Controller
         $sortDesc = filter_var($request->input('sort_desc', false), FILTER_VALIDATE_BOOLEAN) ? 'desc' : 'asc';
         $departmentId = $request->input('department_id');
 
-        $query = Folder::with(['subfolders', 'fileUploads', 'departments', 'addedBy']);
+        $query = Folder::with(['subfolders', 'fileUploads', 'department', 'addedBy']);
 
         if ($user->role === 'admin') {
         } else {
             if ($departmentId) {
-                $query->whereHas('departments', function ($q) use ($departmentId) {
+                $query->whereHas('department', function ($q) use ($departmentId) {
                     $q->where('departments.id', $departmentId);
                 });
-            } elseif ($user->departments && $user->departments->isNotEmpty()) {
-                $query->whereHas('departments', function ($q) use ($user) {
-                    $q->whereIn('departments.id', $user->departments->pluck('id')->toArray());
+            } elseif ($user->department) {
+                $query->whereHas('department', function ($q) use ($user) {
+                    $q->where('department.id', $user->department->id);
                 });
             } else {
                 $query->where('added_by', $user->id);
@@ -61,9 +61,9 @@ class FolderController extends Controller
                 $q->where('folder_name', 'like', "%{$search}%")
                     ->orWhere('local_path', 'like', "%{$search}%")
                     ->orWhereDate('created_at', $search)
-                    ->orWhereHas('departments', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%");
-                    })
+                    // ->orWhereHas('departments', function ($q) use ($search) {
+                    //     $q->where('name', 'like', "%{$search}%");
+                    // })
                     ->orWhereHas('subfolders', function ($q) use ($search) {
                         $q->where('folder_name', 'like', "%{$search}%");
                     })
@@ -129,11 +129,18 @@ class FolderController extends Controller
 
         $validatedData['added_by'] = auth()->id();
 
+        $user = auth()->user();
+        $user->load('position');
+
+        $isSectionHead = $user->position && $user->position->section_head === 1;
+
+        $validatedData['status'] = $isSectionHead ? 'approved' : 'pending';
+
         $folder = Folder::create($validatedData);
 
-        if ($request->has('department_id')) {
-            $folder->departments()->sync($request->department_id);
-        }
+        // if ($request->has('department_id')) {
+        //     $folder->departments()->sync($request->department_id);
+        // }
 
         if ($request->hasFile('uploaded_files')) {
             $files = $request->file('uploaded_files');
@@ -185,11 +192,11 @@ class FolderController extends Controller
             $activity->save();
         }
 
-        $folder->update($request->except('departments'));
+        $folder->update($request->all());
 
-        if ($request->has('department_id')) {
-            $folder->departments()->sync($request->department_id);
-        }
+        // if ($request->has('department_id')) {
+        //     $folder->departments()->sync($request->department_id);
+        // }
 
         return response()->json([
             'status' => 'success',
@@ -311,5 +318,47 @@ class FolderController extends Controller
         $pdf = PDF::loadView('report', ['reportData' => $reportData]);
 
         return $pdf->download('records_digitization_report.pdf');
+    }
+
+    public function approve($id)
+    {
+        $folder = Folder::findOrFail($id);
+
+        if ($folder->status === 'approved') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Folder is already approved.',
+            ], 400);
+        }
+
+        $folder->status = 'approved';
+        $folder->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Folder approved successfully.',
+            'data' => $folder,
+        ]);
+    }
+
+    public function reject($id)
+    {
+        $folder = Folder::findOrFail($id);
+
+        if ($folder->status === 'rejected') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Folder is already rejected.',
+            ], 400);
+        }
+
+        $folder->status = 'rejected';
+        $folder->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Folder rejected successfully.',
+            'data' => $folder,
+        ]);
     }
 }
