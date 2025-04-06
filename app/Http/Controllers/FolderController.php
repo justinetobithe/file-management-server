@@ -27,25 +27,21 @@ class FolderController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $pageSize = $request->input('page_size');
+        $page = $request->input('page', 1);
+        $pageSize = $request->input('page_size', 10);
         $search = $request->input('search');
         $filter = $request->input('filter');
         $sortBy = $request->input('sort_by', 'date_upload');
         $sortDesc = filter_var($request->input('sort_desc', false), FILTER_VALIDATE_BOOLEAN) ? 'desc' : 'asc';
         $departmentId = $request->input('department_id');
+        $status = $request->input('status');  
 
         $query = Folder::with(['subfolders', 'fileUploads', 'department', 'addedBy']);
 
-        if ($user->role === 'admin') {
-        } else {
-            if ($departmentId) {
-                $query->whereHas('department', function ($q) use ($departmentId) {
-                    $q->where('departments.id', $departmentId);
-                });
-            } elseif ($user->department) {
-                $query->whereHas('department', function ($q) use ($user) {
-                    $q->where('department.id', $user->department->id);
-                });
+        if ($user->role !== 'admin') {
+            $user->load('position.department');
+            if ($user->position && $user->position->section_head === 1) {
+                $query->where('department_id', $user->position->department_id);
             } else {
                 $query->where('added_by', $user->id);
             }
@@ -61,9 +57,6 @@ class FolderController extends Controller
                 $q->where('folder_name', 'like', "%{$search}%")
                     ->orWhere('local_path', 'like', "%{$search}%")
                     ->orWhereDate('created_at', $search)
-                    // ->orWhereHas('departments', function ($q) use ($search) {
-                    //     $q->where('name', 'like', "%{$search}%");
-                    // })
                     ->orWhereHas('subfolders', function ($q) use ($search) {
                         $q->where('folder_name', 'like', "%{$search}%");
                     })
@@ -71,6 +64,10 @@ class FolderController extends Controller
                         $q->where('filename', 'like', "%{$search}%");
                     });
             });
+        }
+
+        if ($status) {
+            $query->where('status', $status);
         }
 
         if ($sortBy && $sortDesc) {
@@ -93,18 +90,23 @@ class FolderController extends Controller
             }
         }
 
-        if ($pageSize) {
-            $folders = $query->orderBy('created_at', 'desc')->paginate($pageSize);
-            $folders->getCollection()->transform(function ($folder) {
-                $folder->files = $folder->fileUploads;
-                unset($folder->fileUploads);
-                return $folder;
-            });
-        } else {
-            $folders = $query->orderBy('created_at', 'desc')->get();
-        }
+        $folders = $query->orderBy('created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page);
 
-        return $this->success($folders);
+        $folders->getCollection()->transform(function ($folder) {
+            $folder->files = $folder->fileUploads;
+            unset($folder->fileUploads);
+            return $folder;
+        });
+
+        return $this->success([
+            'data' => $folders->items(),
+            'current_page' => $folders->currentPage(),
+            'last_page' => $folders->lastPage(),
+            'per_page' => $folders->perPage(),
+            'total' => $folders->total(),
+            'next_page_url' => $folders->nextPageUrl(),
+            'prev_page_url' => $folders->previousPageUrl(),
+        ]);
     }
 
 
@@ -359,6 +361,125 @@ class FolderController extends Controller
             'status' => 'success',
             'message' => 'Folder rejected successfully.',
             'data' => $folder,
+        ]);
+    }
+
+    public function addFolder(FolderRequest $request)
+    {
+        $validatedData = $request->validated();
+
+        unset($validatedData['uploaded_files']);
+
+        $validatedData['added_by'] = auth()->id();
+        $user = auth()->user();
+        $user->load('position');
+
+        $isSectionHead = $user->position && $user->position->section_head === 1;
+        $validatedData['status'] = $isSectionHead ? 'approved' : 'pending';
+
+        $existingFolder = Folder::where('folder_name', $validatedData['folder_name'])
+            ->whereNull('department_id')
+            ->first();
+
+        if ($existingFolder) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'A folder with this name already exists without a department.',
+            ], 422);
+        }
+
+        $folder = Folder::create($validatedData);
+
+        if ($request->hasFile('uploaded_files')) {
+            $files = $request->file('uploaded_files');
+            $this->fileUploadService->uploadFiles($folder, $files);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => __('messages.success.created'),
+            'data' => $folder,
+        ]);
+    }
+
+    public function addSubfolder(FolderRequest $request, string $parentFolderId)
+    {
+        $validatedData = $request->validated();
+
+        $existingFolder = Folder::where('department_id', $validatedData['department_id'])
+            ->where('parent_id', $parentFolderId)
+            ->where('folder_name', $validatedData['folder_name'])
+            ->first();
+
+        if ($existingFolder) {
+            return response()->json([
+                'status' => 'error',
+                'message' => __('messages.error.folder_exists'),
+            ], 400);
+        }
+
+        $parentFolder = Folder::findOrFail($parentFolderId);
+
+        $validatedData['parent_id'] = $parentFolder->id;
+        $validatedData['added_by'] = auth()->id();
+
+        $subfolder = Folder::create($validatedData);
+
+        if ($request->hasFile('uploaded_files')) {
+            $files = $request->file('uploaded_files');
+            $this->fileUploadService->uploadFiles($subfolder, $files);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => __('messages.success.created'),
+            'data' => $subfolder,
+        ]);
+    }
+
+
+    public function updateSubfolder(FolderRequest $request, string $id)
+    {
+        $subfolder = Folder::findOrFail($id);
+
+        $oldFilenames = $subfolder->fileUploads->pluck('filename')->toArray();
+        $newFilenames = $oldFilenames;
+
+        $subfolder->update($request->all());
+
+        if ($request->hasFile('uploaded_files')) {
+            $files = $request->file('uploaded_files');
+            $this->fileUploadService->uploadFiles($subfolder, $files);
+            $newFilenames = $subfolder->fresh()->fileUploads->pluck('filename')->toArray();
+        }
+
+        if ($request->current_files) {
+            $this->fileUploadService->deleteFiles($subfolder, json_decode($request->current_files));
+            $newFilenames = $subfolder->fresh()->fileUploads->pluck('filename')->toArray();
+        }
+
+        if ($oldFilenames !== $newFilenames) {
+            $logData = [
+                'old' => ['filename' => $oldFilenames],
+                'attributes' => ['filename' => $newFilenames],
+            ];
+
+            Activity::create([
+                'log_name' => 'default',
+                'description' => 'updated',
+                'subject_type' => Folder::class,
+                'event' => 'updated',
+                'subject_id' => $subfolder->id,
+                'causer_type' => User::class,
+                'causer_id' => auth()->id(),
+                'properties' => $logData,
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => __('messages.success.updated'),
+            'data' => $subfolder,
         ]);
     }
 }

@@ -70,6 +70,11 @@ Route::middleware('auth:sanctum', 'throttle:60,1')->group(function () {
 
         Route::post('/{id}/approve', [FolderController::class, 'approve']);
         Route::post('/{id}/reject', [FolderController::class, 'reject']);
+
+        Route::post('/add', [FolderController::class, 'addFolder']);
+
+        Route::post('/{id}/subfolder', [FolderController::class, 'addSubfolder']);
+        Route::put('/{id}/subfolder', [FolderController::class, 'updateSubfolder']);
     });
 
     Route::get('/designations', [DesignationController::class, 'index']);

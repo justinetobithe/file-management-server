@@ -33,5 +33,6 @@ return [
         'unknown_error' => 'An unknown error occurred. Please try again later.',
         'user_not_found' => 'Account does not exist. Please check your email.',
         'incorrect_password' => 'Incorrect password. Please try again.',
+        'folder_exists' => 'A folder with this name already exists under the selected department!',
     ]
 ];
