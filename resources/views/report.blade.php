@@ -156,22 +156,24 @@
         <table>
             <thead>
                 <tr>
-                    <th>Department</th>
                     <th>Folder Name (Main)</th>
+                    <th>Files</th>
                     <th>Folder Name (Sub)</th>
                     <th>Size</th>
-                    <th>Coverage Period</th>
+                    <!-- <th>Coverage Period</th> -->
                 </tr>
             </thead>
             <tbody>
                 @foreach($reportData['folders'] as $folder)
                 <tr>
-                    <td>
-                        @foreach($folder['departments'] as $department)
-                        {{ $department['name'] }}@if(!$loop->last), @endif
-                        @endforeach
-                    </td>
                     <td>{{ $folder['folder_name'] }}</td>
+                    <td>
+                        @if (!empty($folder['file_uploads']))
+                        <pre>{{ print_r($folder['file_uploads'], true) }}</pre>
+                        @else
+                        <span>No files</span>
+                        @endif
+                    </td> 
                     <td>
                         <ul>
                             @foreach($folder['subfolders'] as $subfolder)
@@ -206,10 +208,10 @@
                             @endforeach
                         </ul>
                     </td>
-                    <td>
+                    <!-- <td>
                         {{ \Carbon\Carbon::parse($folder['start_date'])->format('M. d, Y') }} –
                         {{ \Carbon\Carbon::parse($folder['end_date'])->format('M. d, Y') }}
-                    </td>
+                    </td> -->
                 </tr>
                 @endforeach
             </tbody>

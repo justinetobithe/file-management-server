@@ -302,7 +302,7 @@ class FolderController extends Controller
 
         $checkedBy = $checkedBy ?? null;
 
-        $folders = Folder::with(['departments', 'fileUploads', 'subfolders.fileUploads'])
+        $folders = Folder::with(['department', 'fileUploads', 'subfolders.fileUploads'])
             ->whereIn('id', $request->selected_folders)
             ->get();
 
