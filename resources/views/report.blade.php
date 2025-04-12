@@ -157,7 +157,7 @@
             <thead>
                 <tr>
                     <th>Folder Name (Main)</th>
-                    <th>Files</th>
+                    <!-- <th>Files</th> -->
                     <th>Folder Name (Sub)</th>
                     <th>Size</th>
                     <!-- <th>Coverage Period</th> -->
@@ -167,13 +167,13 @@
                 @foreach($reportData['folders'] as $folder)
                 <tr>
                     <td>{{ $folder['folder_name'] }}</td>
-                    <td>
+                    <!-- <td>
                         @if (!empty($folder['file_uploads']))
                         <pre>{{ print_r($folder['file_uploads'], true) }}</pre>
                         @else
                         <span>No files</span>
                         @endif
-                    </td> 
+                    </td>  -->
                     <td>
                         <ul>
                             @foreach($folder['subfolders'] as $subfolder)
